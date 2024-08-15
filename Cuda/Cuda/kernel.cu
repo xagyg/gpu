@@ -54,10 +54,11 @@ void sieveOfEratosthenes(int n) {
 int main() {
     int n = 1000000000; // Large number to test the CPU
 
+    printf("Calculating the prime numbers smaller than or equal to %d:\n", n);
+
     // Start timing
     clock_t start = clock();
 
-    printf("Calculating the prime numbers smaller than or equal to %d:\n", n);
     sieveOfEratosthenes(n);
 
     // End timing
