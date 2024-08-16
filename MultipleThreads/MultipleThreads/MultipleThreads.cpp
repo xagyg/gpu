@@ -3,8 +3,9 @@
 #include <stdbool.h>
 #include <time.h>
 #include <windows.h>
+#include <math.h>
 
-#define NUM_THREADS 6  // Number of threads
+#define NUM_THREADS 8  // Number of threads
 
 typedef struct {
     bool* prime;
@@ -33,7 +34,9 @@ void sieveOfEratosthenes(int n) {
         prime[i] = true;
     }
 
-    for (int p = 2; p * p <= n; p++) {
+    int sq = sqrt(n);
+
+    for (int p = 2; p <= sqrt(n); p++) {
         if (prime[p] == true) {
             HANDLE threads[NUM_THREADS];
             ThreadData threadData[NUM_THREADS];
@@ -59,6 +62,11 @@ void sieveOfEratosthenes(int n) {
             }
         }
     }
+
+    // Print prime numbers up to 100
+    //for (int p = 2; p <= 100; p++)
+    //    if (prime[p])
+    //        printf("%d ", p);
 
     free(prime);
 }
