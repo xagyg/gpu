@@ -1,4 +1,3 @@
-﻿
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
@@ -7,10 +6,13 @@
 #include <stdbool.h>
 #include <time.h>
 
-__global__ void sieveKernel(bool* d_prime, int n) {
-    int p = blockDim.x * blockIdx.x + threadIdx.x + 2; // Each thread considers a number starting from 2
-    if (p * p <= n && d_prime[p]) {
-        for (int i = p * p; i <= n; i += p) {
+__global__ void sieveKernel(bool* d_prime, int chunkStart, int chunkEnd, int n) {
+    int p = blockDim.x * blockIdx.x + threadIdx.x + chunkStart;
+
+    if (p > chunkEnd || p < 2 || p > n) return; // Ensure p is within valid range
+
+    if (p < 46341 && p * p <= n && d_prime[p]) {
+        for (int i = p * p; i <= chunkEnd; i += p) {
             d_prime[i] = false; // Mark all multiples of p as not prime
         }
     }
@@ -24,27 +26,61 @@ void sieveOfEratosthenes(int n) {
     for (int i = 0; i <= n; i++)
         h_prime[i] = true;
 
+    h_prime[0] = h_prime[1] = false;
+
     // Allocate memory on the GPU
-    cudaMalloc((void**)&d_prime, (n + 1) * sizeof(bool));
+    cudaError_t err = cudaMalloc((void**)&d_prime, (n + 1) * sizeof(bool));
+    if (err != cudaSuccess) {
+        fprintf(stderr, "cudaMalloc failed: %s\n", cudaGetErrorString(err));
+        exit(EXIT_FAILURE);
+    }
 
     // Copy the initialized prime array from the host to the device
-    cudaMemcpy(d_prime, h_prime, (n + 1) * sizeof(bool), cudaMemcpyHostToDevice);
+    err = cudaMemcpy(d_prime, h_prime, (n + 1) * sizeof(bool), cudaMemcpyHostToDevice);
+    if (err != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy (HostToDevice) failed: %s\n", cudaGetErrorString(err));
+        exit(EXIT_FAILURE);
+    }
 
+    int chunkSize = 1000000; // Adjusted chunk size
     int blockSize = 256; // Define the block size
-    int numBlocks = (n + blockSize - 1) / blockSize; // Calculate the number of blocks
+    int numChunks = (n + chunkSize - 1) / chunkSize;
 
-    // Launch the kernel on the GPU
-    sieveKernel <<<numBlocks, blockSize>>> (d_prime, n);
+    for (int chunk = 0; chunk < numChunks; ++chunk) {
+        int chunkStart = chunk * chunkSize + 2;
+        int chunkEnd = min((chunk + 1) * chunkSize + 1, n);
+
+        int numBlocks = (chunkEnd - chunkStart + blockSize - 1) / blockSize;
+
+        sieveKernel << <numBlocks, blockSize >> > (d_prime, chunkStart, chunkEnd, n);
+
+        err = cudaGetLastError();
+        if (err != cudaSuccess) {
+            fprintf(stderr, "Kernel launch failed: %s\n", cudaGetErrorString(err));
+            exit(EXIT_FAILURE);
+        }
+
+        err = cudaDeviceSynchronize();
+        if (err != cudaSuccess) {
+            fprintf(stderr, "cudaDeviceSynchronize failed: %s\n", cudaGetErrorString(err));
+            exit(EXIT_FAILURE);
+        }
+    }
 
     // Copy the result back to the host
-    cudaMemcpy(h_prime, d_prime, (n + 1) * sizeof(bool), cudaMemcpyDeviceToHost);
+    err = cudaMemcpy(h_prime, d_prime, (n + 1) * sizeof(bool), cudaMemcpyDeviceToHost);
+    if (err != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy (DeviceToHost) failed: %s\n", cudaGetErrorString(err));
+        exit(EXIT_FAILURE);
+    }
 
-    // Print all prime numbers
-    //for (int p = 2; p <= n; p++) {
+    // Print some prime numbers
+    //for (int p = 2; p < 1000; p++) {
     //    if (h_prime[p]) {
     //        printf("%d ", p);
     //    }
     //}
+    printf("\n");
 
     // Free memory
     free(h_prime);
@@ -52,7 +88,7 @@ void sieveOfEratosthenes(int n) {
 }
 
 int main() {
-    int n = 1000000000; // Large number to test the CPU
+    int n = 1000000000; // Large number to test
 
     printf("Calculating the prime numbers smaller than or equal to %d:\n", n);
 
