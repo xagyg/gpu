@@ -44,8 +44,8 @@ void sieveOfEratosthenes(int n) {
     }
 
     int chunkSize = 1000000; // Adjusted chunk size
-    int blockSize = 256; // Define the block size
-    int numThreads = 256;
+    int blockSize = 128;      // Define the block size
+    int numThreads = 32;
     int numChunks = (n + chunkSize - 1) / chunkSize;
     int sq = sqrt(n);
 
