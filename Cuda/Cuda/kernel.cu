@@ -45,7 +45,6 @@ void sieveOfEratosthenes(int n) {
 
     int chunkSize = 1000000; // Adjusted chunk size
     int blockSize = 128;      // Define the block size
-    int numThreads = 32;
     int numChunks = (n + chunkSize - 1) / chunkSize;
     int sq = sqrt(n);
 
@@ -55,7 +54,9 @@ void sieveOfEratosthenes(int n) {
 
         int numBlocks = (chunkEnd - chunkStart + blockSize - 1) / blockSize;
 
-        sieveKernel << <numBlocks, numThreads >> > (d_prime, chunkStart, chunkEnd, sq);
+        // blockSize is also being used for the number of threads
+
+        sieveKernel << <numBlocks, blockSize >> > (d_prime, chunkStart, chunkEnd, sq);
 
         err = cudaGetLastError();
         if (err != cudaSuccess) {
