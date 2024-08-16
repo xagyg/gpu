@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <math.h>
 
 __global__ void sieveKernel(bool* d_prime, int chunkStart, int chunkEnd, int sq) {
     int p = blockDim.x * blockIdx.x + threadIdx.x + chunkStart;
