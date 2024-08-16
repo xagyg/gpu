@@ -80,7 +80,7 @@ void sieveOfEratosthenes(int n) {
     //        printf("%d ", p);
     //    }
     //}
-    printf("\n");
+    //printf("\n");
 
     // Free memory
     free(h_prime);
