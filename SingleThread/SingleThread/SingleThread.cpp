@@ -23,8 +23,8 @@ void sieveOfEratosthenes(int n) {
         }
     }
 
-    // Print 10 prime numbers
-    //for (int p = 2; p <= n; p++)
+    // Print prime numbers up to 100
+    //for (int p = 2; p <= 100; p++)
     //    if (prime[p])
      //       printf("%d ", p);
 
