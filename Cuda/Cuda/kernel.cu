@@ -6,12 +6,12 @@
 #include <stdbool.h>
 #include <time.h>
 
-__global__ void sieveKernel(bool* d_prime, int chunkStart, int chunkEnd, int n) {
+__global__ void sieveKernel(bool* d_prime, int chunkStart, int chunkEnd, int sq) {
     int p = blockDim.x * blockIdx.x + threadIdx.x + chunkStart;
 
-    if (p > chunkEnd || p < 2 || p > n) return; // Ensure p is within valid range
+    if (p > chunkEnd || p < 2 || p > sq) return; // Ensure p is within valid range
 
-    if (p < 46341 && p * p <= n && d_prime[p]) {
+    if (p <=sq && d_prime[p]) {
         for (int i = p * p; i <= chunkEnd; i += p) {
             d_prime[i] = false; // Mark all multiples of p as not prime
         }
@@ -45,6 +45,7 @@ void sieveOfEratosthenes(int n) {
     int chunkSize = 1000000; // Adjusted chunk size
     int blockSize = 256; // Define the block size
     int numChunks = (n + chunkSize - 1) / chunkSize;
+    int sq = sqrt(n);
 
     for (int chunk = 0; chunk < numChunks; ++chunk) {
         int chunkStart = chunk * chunkSize + 2;
@@ -52,7 +53,7 @@ void sieveOfEratosthenes(int n) {
 
         int numBlocks = (chunkEnd - chunkStart + blockSize - 1) / blockSize;
 
-        sieveKernel << <numBlocks, blockSize >> > (d_prime, chunkStart, chunkEnd, n);
+        sieveKernel << <numBlocks, blockSize >> > (d_prime, chunkStart, chunkEnd, sq);
 
         err = cudaGetLastError();
         if (err != cudaSuccess) {
