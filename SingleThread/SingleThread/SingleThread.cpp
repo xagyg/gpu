@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <math.h>
 
 void sieveOfEratosthenes(int n) {
     // Create a boolean array "prime[0..n]" and initialize
@@ -11,7 +12,9 @@ void sieveOfEratosthenes(int n) {
     for (int i = 0; i <= n; i++)
         prime[i] = true;
 
-    for (int p = 2; p * p <= n; p++) {
+    int sq = sqrt(n);
+
+    for (int p = 2; p <= sq; p++) {
         // If prime[p] is not changed, then it is a prime
         if (prime[p] == true) {
             // Update all multiples of p to false
@@ -20,10 +23,10 @@ void sieveOfEratosthenes(int n) {
         }
     }
 
-    // Print all prime numbers
+    // Print 10 prime numbers
     //for (int p = 2; p <= n; p++)
     //    if (prime[p])
-    //        printf("%d ", p);
+     //       printf("%d ", p);
 
     free(prime);
 }
