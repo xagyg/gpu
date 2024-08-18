@@ -54,7 +54,7 @@ void sieveOfEratosthenes(int n) {
 
         int numBlocks = (chunkEnd - chunkStart + blockSize - 1) / blockSize;
 
-        // blockSize is also being used for the number of threads
+        // blockSize is the number of threads
 
         sieveKernel << <numBlocks, blockSize >> > (d_prime, chunkStart, chunkEnd, sq);
 
