@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <math.h>
 
-#define NUM_THREADS 8  // Number of threads
+#define NUM_THREADS 6  // Number of threads
 
 typedef struct {
     bool* prime;
