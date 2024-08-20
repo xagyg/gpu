@@ -36,7 +36,7 @@ void sieveOfEratosthenes(int n) {
 
     int sq = sqrt(n);
 
-    for (int p = 2; p <= sqrt(n); p++) {
+    for (int p = 2; p <= sq; p++) {
         if (prime[p] == true) {
             HANDLE threads[NUM_THREADS];
             ThreadData threadData[NUM_THREADS];
