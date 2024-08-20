@@ -12,7 +12,7 @@ __global__ void sieveKernel(bool* d_prime, int chunkStart, int chunkEnd, int sq)
 
     if (p > chunkEnd || p < 2 || p > sq) return; // Ensure p is within valid range
 
-    if (p <= sq && d_prime[p]) {
+    if (d_prime[p]) {
         for (int i = p * p; i <= chunkEnd; i += p) {
             d_prime[i] = false; // Mark all multiples of p as not prime
         }
