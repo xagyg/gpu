@@ -56,7 +56,7 @@ void sieveOfEratosthenes(int n) {
 
         // blockSize is the number of threads
 
-        sieveKernel << <numBlocks, blockSize >> > (d_prime, chunkStart, chunkEnd, sq);
+        sieveKernel <<<numBlocks, blockSize>>> (d_prime, chunkStart, chunkEnd, sq);
 
         err = cudaGetLastError();
         if (err != cudaSuccess) {
