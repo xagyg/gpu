@@ -53,16 +53,16 @@ void sieveOfEratosthenes(int n) {
         exit(EXIT_FAILURE);
     }
 
-    int chunkSize = 1000; // Each thread processes 1000 numbers
+    int chunkSize = 10000;
     int numChunks = (n + chunkSize - 1) / chunkSize;
     int sq = sqrt(n);
 
     // Each block contains one thread
-    int blockSize = 1;
+    int blockSize = 128;
     int numBlocks = numChunks;
 
     // Launch the kernel
-    sieveKernel << <numBlocks, 128 >> > (d_prime, n, chunkSize, sq);
+    sieveKernel <<<numBlocks, blockSize>>> (d_prime, n, chunkSize, sq);
 
     err = cudaGetLastError();
     if (err != cudaSuccess) {
