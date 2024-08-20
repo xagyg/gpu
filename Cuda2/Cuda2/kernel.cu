@@ -18,7 +18,7 @@ __global__ void sieveKernel(bool* d_prime, int n, int chunkSize, int sq) {
 
     //int p = chunkStart;
 
-    // For each number q up to sqrt(n), if it's prime, mark its multiples in this chunk
+    // For each number up to sqrt(n), if it's prime, mark its multiples in this chunk
     for (int p = 2; p <= sq; ++p) {
         if (d_prime[p]) {
             // Start marking multiples of p within the chunk range
