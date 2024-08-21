@@ -19,7 +19,7 @@ __global__ void sieveKernel(bool* d_prime, int n, int chunkSize, int sq) {
     //int p = chunkStart;
 
     // Start the loop from the largest prime smaller than or equal to chunkStart
-    for (int p = max(2, chunkStart); p <= sq; ++p) {
+    for (int p = 2; p <= sq; ++p) {
         if (d_prime[p]) {
             int start = max(p * p, (chunkStart + p - 1) / p * p); // Start marking multiples of p within the chunk range
             for (int i = start; i <= chunkEnd; i += p) {
