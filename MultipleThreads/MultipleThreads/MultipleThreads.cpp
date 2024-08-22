@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <math.h>
 
-#define NUM_THREADS 6  // Number of threads
+#define NUM_THREADS 8  // Number of threads
 
 typedef struct {
     bool* prime;
@@ -41,16 +41,24 @@ void sieveOfEratosthenes(int n) {
             HANDLE threads[NUM_THREADS];
             ThreadData threadData[NUM_THREADS];
 
-            int blockSize = (n - p * p) / NUM_THREADS;
+            // Adjust the block size calculation to avoid overlap
+            int blockSize = (n / NUM_THREADS) + 1;
 
             for (int t = 0; t < NUM_THREADS; t++) {
                 threadData[t].prime = prime;
                 threadData[t].p = p;
                 threadData[t].start = p * p + t * blockSize;
+
+                // Ensure that start is a multiple of p
+                if (threadData[t].start % p != 0) {
+                    threadData[t].start += p - (threadData[t].start % p);
+                }
+
                 threadData[t].end = (t == NUM_THREADS - 1) ? n : (threadData[t].start + blockSize - 1);
 
-                if (threadData[t].start < p * p) {
-                    threadData[t].start = p * p;
+                // Ensure that the end does not exceed n
+                if (threadData[t].end > n) {
+                    threadData[t].end = n;
                 }
 
                 threads[t] = CreateThread(NULL, 0, markMultiples, &threadData[t], 0, NULL);
@@ -63,13 +71,15 @@ void sieveOfEratosthenes(int n) {
         }
     }
 
-    // Print prime numbers up to 100
-    //for (int p = 2; p <= 100; p++)
-    //    if (prime[p])
-    //        printf("%d ", p);
+    int count = 0;
+    for (int p = 2; p <= n; p++)
+        if (prime[p]) count++;
+
+    printf("count %d\n ", count);
 
     free(prime);
 }
+
 
 int main() {
     int n = 1000000000; // Large number to test the CPU
