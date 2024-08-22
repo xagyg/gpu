@@ -17,40 +17,12 @@ __global__ void sieveKernel(int* d_prime, int n, int sq) {
 
     //if (d_prime[idx]) {
        // printf("marking %ds\n", idx);
-        for (int i = idx * idx; i <= n; i += idx) {
-            //atomicExch(&d_prime[i], 0); // Atomic operation to prevent overwrites
-            //if (l_prime[i]) {
+        for (int i = idx * idx; i <= n; i += idx) {            
                 d_prime[i] = 0;
                 //printf("%d:%d ", idx, i);
-            //}
         }
 }
 
-
-/**
-__global__ void sieveKernel(int* d_prime, int n, int sq) {
-    extern __shared__ int s_prime[];  // Shared memory
-
-    int idx = blockDim.x * blockIdx.x + threadIdx.x;  // Global index
-    int localIdx = threadIdx.x;  // Local index in shared memory
-
-    // Load data into shared memory
-    if (idx <= sq) {
-        s_prime[localIdx] = d_prime[idx];
-    }
-    __syncthreads();
-
-    // Sieve operation
-    if (idx >= 2 && idx <= sq && s_prime[localIdx] == 1) {
-        int start = idx * idx;
-        for (int i = start; i <= n; i += idx) {
-            //if (d_prime[i] == 1) {
-                d_prime[i] = 0;
-            //}
-        }
-    }
-}
-**/
 
 void sieveOfEratosthenes(int n) {
     int* h_prime = (int*)malloc((n + 1) * sizeof(int)); // Host array
@@ -121,7 +93,7 @@ void sieveOfEratosthenes(int n) {
 
 
 int main() {
-    int n = 100000000; // Large number to test
+    int n = 10000000; // Large number to test
 
     printf("Calculating the prime numbers smaller than or equal to %d:\n", n);
 
