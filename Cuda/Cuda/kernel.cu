@@ -15,12 +15,11 @@ __global__ void sieveKernel(int* d_prime, int n, int sq) {
     if (idx > sq || idx < 2 || !d_prime[idx]) return;
     //printf("index %d, block, %d, thread %d, dim, %d\n", idx, blockIdx.x, threadIdx.x, blockDim.x);
 
-    //if (d_prime[idx]) {
-       // printf("marking %ds\n", idx);
-        for (int i = idx * idx; i <= n; i += idx) {            
-                d_prime[i] = 0;
-                //printf("%d:%d ", idx, i);
-        }
+    // printf("marking %ds\n", idx);
+    for (int i = idx * idx; i <= n; i += idx) {            
+        d_prime[i] = 0;
+        //printf("%d:%d ", idx, i);
+    }
 }
 
 
