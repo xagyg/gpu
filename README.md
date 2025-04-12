@@ -5,3 +5,5 @@ MultipleThreads contains a Visual Studio 2022 solution for executing the Sieve o
 Cuda contains a Visual Studio 2022 solution for executing the Sieve of Eratosthenes on the GPU.
 
 Requires Visual Studio 2022 (Community Edition) and the NVIDIA CUDA SDK installed.
+
+Author: Brad Long (2025)
